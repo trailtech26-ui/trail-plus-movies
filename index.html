@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Trail Plus TV - Radio</title>
+    <title>Trail Plus TV - Movies</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -18,752 +18,1114 @@
         body {
             background: #0A0A0A;
             min-height: 100vh;
-            overflow: hidden;
-            position: relative;
-            color: #07071F;
+            color: white;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
             touch-action: pan-y;
         }
 
-        /* Radio Panel Styles - EXACT SAME AS MAIN APP */
-        .radio-panel {
-            position: fixed;
-            bottom: -65vh;
-            left: 0;
-            width: 100%;
-            height: 65vh;
-            background: linear-gradient(135deg, #0a0a0a, #1e40af);
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            border-top: 0.5px solid #1C3CA2;
-            z-index: 1002;
-            transition: bottom 0.3s ease;
-            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
+        /* Prevent zooming */
+        html {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+            touch-action: manipulation;
         }
 
-        .radio-panel.open {
-            bottom: 0px;
+        input, textarea, select {
+            font-size: 16px;
         }
 
-        .radio-header {
-            padding: 20px 20px 15px;
-            border-bottom: 0.5px solid #1C3CA2;
-            text-align: center;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .radio-header h2 {
-            font-size: 1.4rem;
-            color: #99CBFF;
-            margin: 0;
-        }
-
-        .radio-back-button {
-            position: absolute;
-            left: 20px;
-            background: none;
-            border: none;
-            color: #99CBFF;
-            font-size: 1rem;
-            cursor: pointer;
-            padding: 5px;
-            z-index: 1;
-        }
-
-        .radio-back-text {
-            position: absolute;
-            left: 40px;
-            color: #99CBFF;
-            font-size: 0.9rem;
-        }
-
-        .swipe-handle {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 5px;
-            background: #1C3CA2;
-            border-radius: 3px;
-        }
-
-        .radio-content {
-            flex: 1;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 0.3rem 1rem 0.6rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-            max-height: calc(80vh - 85px);
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .radio-content::-webkit-scrollbar {
-            width: 0px;
-            opacity: 0;
-            transition: width 0.3s ease, opacity 0.3s ease;
-        }
-
-        .radio-content.scrolling::-webkit-scrollbar {
-            width: 2px;
-            opacity: 1;
-        }
-
-        .radio-content::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 1px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .radio-content.scrolling::-webkit-scrollbar-thumb {
-            opacity: 1;
-        }
-
-        .radio-content::-webkit-scrollbar-track {
-            background: none;
-        }
-
-        .radio-item {
-            background: linear-gradient(135deg, #000005, #000040);
-            padding: 0.8rem;
-            border-radius: 14px;
+        /* Header Styles */
+        .movies-header {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            border: 0.5px solid rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
-            min-height: 80px;
-            height: 80px;
-            transition: background 0.2s ease;
-        }
-
-        .radio-item.active {
-            border-left: 1px solid #ffffff;
-            background: linear-gradient(to left, #000010, #000030);
-            border: 0.5px solid #1C3CA2;
-        }
-
-        .radio-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.4rem;
-            flex-shrink: 0;
-            background: linear-gradient(135deg, #0a0a0a, #1e40af);
-        }
-
-        .radio-info {
-            flex-grow: 1;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .radio-name {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #fff;
-            margin-bottom: 0.2rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .radio-location {
-            color: #aabc;
-            font-size: 0.85rem;
-            font-weight: 400;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .card-play-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            padding: 8px;
-            border-radius: 50%;
-            width: 34px;
-            height: 34px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            transition: background 0.2s ease;
-            cursor: pointer;
-        }
-
-        .card-play-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        /* Now Playing Panel - EXACT SAME AS MAIN APP */
-        .now-playing-panel {
-            position: fixed;
-            bottom: 0;
+            padding: 8px 15px;
+            background: #000025;
+            border-bottom: 1px solid #2196f3;
+            position: sticky;
+            top: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(135deg, #0a0a0a, #1e40af);
-            padding: 15px 20px;
+            z-index: 100;
+        }
+
+        .movies-back-button {
+            background: none;
+            border: none;
+            color: #99CBFF;
+            font-size: 1.3rem;
+            margin-right: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .movies-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #99CBFF;
+            flex: 1;
+        }
+
+        .header-controls {
             display: flex;
             align-items: center;
             gap: 15px;
-            z-index: 1003;
-            backdrop-filter: blur(12px);
-            border-top: 0.5px solid #1C3CA2;
-            transform: translateY(100%);
-            opacity: 0;
-            transition: all 0.2s ease-out;
-            max-width: 1200px;
-            margin: 0 auto;
-            min-height: 80px;
         }
 
-        .now-playing-panel.visible {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .now-playing-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 30%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 1rem;
-            background: linear-gradient(135deg, #0a0a0a, #1e40af);
-            flex-shrink: 0;
-        }
-
-        .now-playing-info {
-            min-width: 0;
-            max-width: 240px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            overflow: hidden;
-            flex: 1;
-        }
-
-        .now-playing-name {
-            font-weight: 700;
-            color: white;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-size: 1.1rem;
-        }
-
-        .now-playing-location {
-            color: #b0b8c8;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .now-playing-controls {
-            display: flex;
-            gap: 5px;
-            background: none;
-            flex-shrink: 0;
-            margin-left: auto;
-            align-items: center;
-        }
-
-        .now-playing-btn {
+        /* Search Icon Button */
+        .search-icon-btn {
             background: none;
             border: none;
-            color: #fff;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.15rem;
-            transition: background 0.3s ease, transform 0.2s ease;
-            cursor: pointer;
-        }
-
-        .now-playing-stop-btn {
-            margin-left: 5px;
-            font-size: 1.2rem;
-        }
-
-        /* Floating Playback Indicator - EXACT SAME AS MAIN APP */
-        .floating-playback-indicator {
-            position: fixed;
-            bottom: 90px;
-            right: 20px;
-            width: 47px;
-            height: 47px;
-            background: #0D47A1;
-            border-radius: 25%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             color: #99CBFF;
-            font-size: 1.4rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            z-index: 1002;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .search-icon-btn:hover {
+            color: #2196f3;
+            transform: scale(1.1);
+        }
+
+        /* Search Header - Hidden by default */
+        .search-header {
+            display: none;
+            align-items: center;
+            padding: 8px 15px;
+            background: #000025;
+            border-bottom: 1px solid #2196f3;
+            position: sticky;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .search-back-button {
+            background: none;
+            border: none;
+            color: #99CBFF;
+            font-size: 1.3rem;
+            margin-right: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Professional Search Container in Search Header */
+        .search-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            position: relative;
+            background: #00002C;
+            border-radius: 15px;
+            padding: 0;
+            height: 40px;
+            border: 1px solid rgba(33, 150, 243, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .search-container:focus-within {
+            border-color: #2196f3;
+            transform: translateY(-1px);
+        }
+
+        .search-icon {
+            color: #99CBFF;
+            font-size: 1rem;
+            padding: 0 15px 0 18px;
+            transition: color 0.3s ease;
+        }
+
+        .search-container:focus-within .search-icon {
+            color: #2196f3;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 100%;
+            background: none;
+            color: white;
+            font-size: 16px;
+            border: none;
+            outline: none;
+            padding: 0;
+            font-weight: 500;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Cancel Icon */
+        .cancel-icon {
+            color: #99CBFF;
+            font-size: 1rem;
+            padding: 0 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.2s ease;
-            cursor: pointer;
         }
 
-        .floating-playback-indicator.visible {
+        .cancel-icon.visible {
             opacity: 1;
             visibility: visible;
         }
 
-        .floating-playback-indicator:hover {
+        .cancel-icon:hover {
+            color: #f00;
             transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4);
         }
 
-        .floating-playback-indicator i {
-            animation: pulse 2s infinite;
+        /* Ellipsis Menu */
+        .ellipsis-menu-container {
+            position: relative;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        .ellipsis-btn {
+            background: none;
+            border: none;
+            color: #99CBFF;
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 8px;
+            transition: all 0.3s ease;
         }
 
-        /* Overlay - EXACT SAME AS MAIN APP */
-        .overlay {
-            position: fixed;
+        .ellipsis-btn:hover {
+            color: #2196f3;
+            transform: rotate(90deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: -5px;
+            right: 30px;
+            background: linear-gradient(135deg, #000025, #001a4d);
+            border: 1px solid rgba(33, 150, 243, 0.5);
+            border-radius: 10px;
+            padding: 0px 0px;
+            min-width: 100px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-0px);
+            transition: all 0.3s ease;
+            z-index: 101;
+        }
+
+        .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(5px);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #99CBFF;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(33, 150, 243, 0.2);
+            color: #fff;
+        }
+
+        .dropdown-item i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Filters Section - Scrolls with content */
+        .movies-filters {
+            display: flex;
+            gap: 10px;
+            padding: 12px 15px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            background: #0A0A0A;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 0;
+        }
+
+        .movies-filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-btn {
+            background: none;
+            border: 1px solid #2196f3;
+            color: #99CBFF;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #2196f3, #1C3CA2);
+            color: #fff;
+        }
+
+        .filter-btn:hover:not(.active) {
+            background: rgba(33, 150, 243, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Movies Grid */
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 15px;
+            margin-top: 0;
+        }
+
+        .movie-card {
+            background: none;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(33,150,243,0.3);
+            position: relative;
+            transition: transform 0.3s ease;
+            height: 280px;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-1px);
+            border-color: rgba(33, 150, 243, 0.5);
+        }
+
+        .movie-poster-container {
+            height: 230px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 100%;
+            object-fit: fit;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.5s ease;
+        }
+
+        .movie-poster.loaded {
+            opacity: 1;
+        }
+
+        .movie-card:hover .movie-poster {
+            transform: scale(1.15));
+        }
+
+        .movie-poster-container.fallback::after {
+            content: 'Movie Poster';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1c28, #2a2c38);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #99CBFF;
+            font-size: 0.9rem;
+            opacity: 1;
+            z-index: 2;
+        }
+
+        .movie-info {
+            padding: 12px;
+            background: #00002c;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1;
+        }
+
+        .movie-title {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .movie-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #99CBFF;
+        }
+
+        .movie-category {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70%;
+        }
+
+        .movie-year {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .movie-year i {
+            color: #FFD700;
+            font-size: 0.75rem;
+        }
+
+        /* Play Button Overlay */
+        .play-overlay {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.7);
-            z-index: 1001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            transition: opacity 0.3s ease;
+            z-index: 3;
         }
 
-        .overlay.active {
+        .movie-card:hover .play-overlay {
             opacity: 1;
-            visibility: visible;
         }
 
-        /* Responsive Adjustments */
-        @media (max-width: 480px) {
-            .now-playing-icon {
-                width: 42px;
-                height: 42px;
-                font-size: 1.2rem;
-            }
-
-            .now-playing-name {
-                font-size: 1rem;
-            }
-
-            .now-playing-location {
-                font-size: 0.7rem;
-            }
-
-            .now-playing-btn {
-                width: 42px;
-                height: 42px;
-                font-size: 1.2rem;
-            }
-
-            .now-playing-stop-btn {
-                margin-left: 15px;
-            }
-
-            .radio-icon {
-                width: 45px;
-                height: 45px;
-                font-size: 1.3rem;
-            }
-
-            .radio-panel {
-                height: 70vh;
-                bottom: -70vh;
-            }
+        .play-btn {
+            background: linear-gradient(135deg, #2196f3, #1C3CA2);
+            border: none;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
         }
 
+        .play-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* No Results */
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+
+        .no-results i {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.5;
+            color: #99CBFF;
+        }
+
+        .no-results h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+            color: #99CBFF;
+        }
+
+        .no-results p {
+            opacity: 0.8;
+        }
+
+        /* Shimmer Effect */
+        .shimmer {
+            position: relative;
+            overflow: hidden;
+            background: #1a1c28;
+        }
+
+        .shimmer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            animation: shimmer 1.5s infinite;
+            z-index: 2;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .movie-poster-container.shimmer {
+            background: #1a1c28;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Loading Indicator */
+        .loading-indicator {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            color: #99CBFF;
+        }
+
+        .loading-indicator i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
         @media (min-width: 768px) {
-            .radio-panel {
-                height: 50vh;
-                bottom: -50vh;
+            .movies-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+                padding: 20px;
             }
 
-            .now-playing-info {
-                max-width: 240px;
+            .movie-card {
+                height: 320px;
             }
 
-            .radio-item {
-                min-height: 85px;
-                height: 85px;
+            .movie-poster-container {
+                height: 240px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .movies-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 25px;
+                padding: 25px;
+            }
+
+            .movie-card {
+                height: 350px;
+            }
+
+            .movie-poster-container {
+                height: 260px;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .movies-grid {
+                grid-template-columns: repeat(5, 1fr);
             }
         }
     </style>
 </head>
 <body>
-    <!-- Radio Panel - EXACT SAME STRUCTURE AS MAIN APP -->
-    <div class="radio-panel open" id="radioPanel">
-        <div class="radio-header">
-            <button class="radio-back-button" id="radioBackButton">
-                <i class="fas fa-chevron-left"></i>
+    <!-- Main Movies Header -->
+    <div class="movies-header" id="moviesHeader">
+        <button class="movies-back-button" id="moviesBackButton">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="movies-title">Movies</div>
+        <div class="header-controls">
+            <button class="search-icon-btn" id="searchIconBtn">
+                <i class="fas fa-search"></i>
             </button>
-            <span class="radio-back-text">Back</span>
-            <div class="swipe-handle"></div>
-            <h2>Radio Stations</h2>
-        </div>
-        <div class="radio-content" id="radioList">
-            <!-- Radio items will be dynamically added here -->
-        </div>
-    </div>
-
-    <!-- Now Playing Panel - EXACT SAME STRUCTURE AS MAIN APP -->
-    <div class="now-playing-panel" id="nowPlayingPanel">
-        <div class="now-playing-icon" id="nowPlayingIcon">
-            <i class="fas fa-radio"></i>
-        </div>
-        <div class="now-playing-info">
-            <div class="now-playing-name" id="nowPlayingName">Select a station</div>
-            <div class="now-playing-location" id="nowPlayingLocation">Location</div>
-        </div>
-        <div class="now-playing-controls">
-            <button class="now-playing-btn" id="nowPlayingPrevBtn">
-                <i class="fas fa-backward"></i>
-            </button>
-            <button class="now-playing-btn" id="nowPlayingPlayBtn">
-                <i class="fas fa-play"></i>
-            </button>
-            <button class="now-playing-btn" id="nowPlayingNextBtn">
-                <i class="fas fa-forward"></i>
-            </button>
-            <button class="now-playing-btn now-playing-stop-btn" id="nowPlayingStopBtn">
-                <i class="fas fa-stop"></i>
-            </button>
+            <div class="ellipsis-menu-container">
+                <button class="ellipsis-btn" id="ellipsisBtn">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <button class="dropdown-item" id="refreshOption">
+                        <i class="fas fa-redo"></i>
+                        <span>Refresh</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Floating Playback Indicator - EXACT SAME STRUCTURE AS MAIN APP -->
-    <div class="floating-playback-indicator" id="floatingPlaybackIndicator">
-        <i class="fas fa-radio"></i>
+    <!-- Search Header - Hidden by default -->
+    <div class="search-header" id="searchHeader">
+        <button class="search-back-button" id="searchBackButton">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" placeholder="Search movies..." class="search-input" id="searchInput" enterkeyhint="search">
+            <i class="fas fa-times cancel-icon" id="cancelIcon"></i>
+        </div>
     </div>
 
-    <!-- Overlay - EXACT SAME STRUCTURE AS MAIN APP -->
-    <div class="overlay active" id="overlay"></div>
+    <!-- Movies Filters - Scrolls with content -->
+    <div class="movies-filters" id="moviesFilters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="action">Action</button>
+        <button class="filter-btn" data-filter="comedy">Comedy</button>
+        <button class="filter-btn" data-filter="drama">Drama</button>
+        <button class="filter-btn" data-filter="horror">Horror</button>
+        <button class="filter-btn" data-filter="sci-fi">Sci-Fi</button>
+        <button class="filter-btn" data-filter="romance">Romance</button>
+        <button class="filter-btn" data-filter="thriller">Thriller</button>
+    </div>
+
+    <!-- Movies Grid -->
+    <div class="movies-grid" id="moviesGrid">
+        <div class="loading-indicator">
+            <i class="fas fa-spinner"></i>
+            <p>Loading movies...</p>
+        </div>
+    </div>
 
     <script>
-        // Radio stations data - SAME AS MAIN APP
-        const stations = [
-            { id: 1, name: "Banana FM", location: "Moshi", icon: "fas fa-radio", url: "https://www.crownmedia.co.tz" },
-            { id: 2, name: "Radio One", location: "Dar es Salaam", icon: "fas fa-radio", url: "http://radioone.co.tz:8000/stream" },
-            { id: 3, name: "TBC Taifa", location: "National", icon: "fas fa-radio", url: "https://s12.myradiostream.com" },
-            { id: 4, name: "Wasafi FM", location: "Dar es Salaam", icon: "fas fa-radio", url: "http://radio.wasafimedia.co.tz:8000/wasafi-fm" },
-            { id: 5, name: "Uhuru Radio", location: "Dar es Salaam", icon: "fas fa-radio", url: "https://uhururadio.co.tz/stream" },
-            { id: 6, name: "Times FM", location: "Dar es Salaam", icon: "fas fa-radio", url: "https://timesfm.co.tz/stream" },
-            { id: 7, name: "EATV Radio", location: "Dar es Salaam", icon: "fas fa-radio", url: "https://eatv.co.tz/radio" },
-            { id: 8, name: "Kiss FM", location: "Dar es Salaam", icon: "fas fa-radio", url: "https://kissfm.co.tz/stream" },
-            { id: 9, name: "Clouds FM", location: "Dar es Salaam", icon: "fas fa-radio", url: "http://eu6.fastcast4u.com:5306/;" },
-            { id: 10, name: "Capital Radio", location: "Dar es Salaam", icon: "fas fa-radio", url: "https://capitalradio.co.tz/stream" },
-            { id: 11, name: "Azam Radio", location: "Dar es Salaam", icon: "fas fa-radio", url: "https://radioonetanzania.radioca.st/stream" },
-            { id: 12, name: "Radio Free Africa", location: "Dar es Salaam", icon: "fas fa-radio", url: "https://s3.radio.co/s8df0149e0/listen" },
-            { id: 13, name: "Radio Tumaini", location: "Dodoma", icon: "fas fa-radio", url: "https://radiotumaini.org/stream" },
-            { id: 14, name: "EFM Radio", location: "Arusha", icon: "fas fa-radio", url: "https://efmradio.co.tz/stream" },
-            { id: 15, name: "Times FM", location: "Mwanza", icon: "fas fa-radio", url: "http://eu6.fastcast4u.com:5306/;" }
+        // Real movie data with actual movie posters from TMDb
+        const movies = [
+            {
+                id: 1,
+                title: "Dune: Part Two",
+                year: 2024,
+                rating: 8.7,
+                runtime: "166 min",
+                genres: ["Action", "Adventure", "Sci-Fi"],
+                poster: "https://image.tmdb.org/t/p/w500/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 2,
+                title: "Oppenheimer",
+                year: 2023,
+                rating: 8.3,
+                runtime: "180 min",
+                genres: ["Drama", "History", "Thriller"],
+                poster: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 3,
+                title: "Barbie",
+                year: 2023,
+                rating: 7.8,
+                runtime: "114 min",
+                genres: ["Comedy", "Adventure", "Fantasy"],
+                poster: "https://image.tmdb.org/t/p/w500/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 4,
+                title: "John Wick: Chapter 4",
+                year: 2023,
+                rating: 7.7,
+                runtime: "169 min",
+                genres: ["Action", "Thriller", "Crime"],
+                poster: "https://image.tmdb.org/t/p/w500/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 5,
+                title: "Spider-Man: Across the Spider-Verse",
+                year: 2023,
+                rating: 8.7,
+                runtime: "140 min",
+                genres: ["Action", "Adventure", "Animation"],
+                poster: "https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 6,
+                title: "The Batman",
+                year: 2022,
+                rating: 7.8,
+                runtime: "176 min",
+                genres: ["Action", "Crime", "Drama"],
+                poster: "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 7,
+                title: "Top Gun: Maverick",
+                year: 2022,
+                rating: 8.2,
+                runtime: "130 min",
+                genres: ["Action", "Drama"],
+                poster: "https://image.tmdb.org/t/p/w500/62HCnUTziyWcpDaBO2i1DX17ljH.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 8,
+                title: "Avatar: The Way of Water",
+                year: 2022,
+                rating: 7.6,
+                runtime: "192 min",
+                genres: ["Action", "Adventure", "Sci-Fi"],
+                poster: "https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 9,
+                title: "Black Panther: Wakanda Forever",
+                year: 2022,
+                rating: 6.9,
+                runtime: "161 min",
+                genres: ["Action", "Adventure", "Drama"],
+                poster: "https://image.tmdb.org/t/p/w500/sv1xJUazXeYqALzczSZ3O6nkH75.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 10,
+                title: "Everything Everywhere All at Once",
+                year: 2022,
+                rating: 7.8,
+                runtime: "139 min",
+                genres: ["Action", "Adventure", "Comedy"],
+                poster: "https://image.tmdb.org/t/p/w500/w3LxiVYdWWRvEVdn5RYq6jIqkb1.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 11,
+                title: "The Super Mario Bros. Movie",
+                year: 2023,
+                rating: 7.1,
+                runtime: "92 min",
+                genres: ["Animation", "Adventure", "Comedy"],
+                poster: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 12,
+                title: "Guardians of the Galaxy Vol. 3",
+                year: 2023,
+                rating: 7.9,
+                runtime: "150 min",
+                genres: ["Action", "Adventure", "Comedy"],
+                poster: "https://image.tmdb.org/t/p/w500/r2J02Z2OpNTctfOSN1Ydgii51I3.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 13,
+                title: "Mission: Impossible - Dead Reckoning Part One",
+                year: 2023,
+                rating: 7.8,
+                runtime: "163 min",
+                genres: ["Action", "Adventure", "Thriller"],
+                poster: "https://image.tmdb.org/t/p/w500/NNxYkU70HPurnNCSiCjYAmacwm.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 14,
+                title: "The Little Mermaid",
+                year: 2023,
+                rating: 7.2,
+                runtime: "135 min",
+                genres: ["Adventure", "Family", "Fantasy"],
+                poster: "https://image.tmdb.org/t/p/w500/ym1dxyOk4jFcSl4Q2zmRrA5BEEN.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 15,
+                title: "Fast X",
+                year: 2023,
+                rating: 6.9,
+                runtime: "141 min",
+                genres: ["Action", "Adventure", "Crime"],
+                poster: "https://image.tmdb.org/t/p/w500/fiVW06jE7z9YnO4trhaMEdclSiC.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 16,
+                title: "Ant-Man and the Wasp: Quantumania",
+                year: 2023,
+                rating: 6.5,
+                runtime: "124 min",
+                genres: ["Action", "Adventure", "Comedy"],
+                poster: "https://image.tmdb.org/t/p/w500/qnqGbB22YJ7dSs4o6M7exTpNxPz.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 17,
+                title: "Creed III",
+                year: 2023,
+                rating: 7.1,
+                runtime: "116 min",
+                genres: ["Drama", "Sport"],
+                poster: "https://image.tmdb.org/t/p/w500/cvsXj3I9Q2iyyIo95AecSd1tad7.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 18,
+                title: "Shazam! Fury of the Gods",
+                year: 2023,
+                rating: 6.7,
+                runtime: "130 min",
+                genres: ["Action", "Adventure", "Comedy"],
+                poster: "https://image.tmdb.org/t/p/w500/A3ZbZsmsvNGdprRi2lKgGEeVLEH.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 19,
+                title: "The Flash",
+                year: 2023,
+                rating: 6.7,
+                runtime: "144 min",
+                genres: ["Action", "Adventure", "Fantasy"],
+                poster: "https://image.tmdb.org/t/p/w500/rktDFPbfHfUbArZ6OOOKsXcv0Bm.jpg",
+                videoUrl: "#"
+            },
+            {
+                id: 20,
+                title: "Transformers: Rise of the Beasts",
+                year: 2023,
+                rating: 7.0,
+                runtime: "127 min",
+                genres: ["Action", "Adventure", "Sci-Fi"],
+                poster: "https://image.tmdb.org/t/p/w500/gPbM0MK8CP8A174rmUwGsADNYKD.jpg",
+                videoUrl: "#"
+            }
         ];
 
-        // DOM elements - SAME AS MAIN APP
-        const radioPanel = document.getElementById('radioPanel');
-        const radioBackButton = document.getElementById('radioBackButton');
-        const overlay = document.getElementById('overlay');
-        const radioList = document.getElementById('radioList');
-        const nowPlayingPanel = document.getElementById('nowPlayingPanel');
-        const nowPlayingPlayBtn = document.getElementById('nowPlayingPlayBtn');
-        const nowPlayingStopBtn = document.getElementById('nowPlayingStopBtn');
-        const nowPlayingPrevBtn = document.getElementById('nowPlayingPrevBtn');
-        const nowPlayingNextBtn = document.getElementById('nowPlayingNextBtn');
-        const nowPlayingName = document.getElementById('nowPlayingName');
-        const nowPlayingLocation = document.getElementById('nowPlayingLocation');
-        const nowPlayingIcon = document.getElementById('nowPlayingIcon');
-        const floatingPlaybackIndicator = document.getElementById('floatingPlaybackIndicator');
+        // DOM elements
+        const moviesHeader = document.getElementById('moviesHeader');
+        const moviesBackButton = document.getElementById('moviesBackButton');
+        const searchHeader = document.getElementById('searchHeader');
+        const searchBackButton = document.getElementById('searchBackButton');
+        const searchIconBtn = document.getElementById('searchIconBtn');
+        const searchInput = document.getElementById('searchInput');
+        const cancelIcon = document.getElementById('cancelIcon');
+        const moviesFilters = document.getElementById('moviesFilters');
+        const moviesGrid = document.getElementById('moviesGrid');
+        const ellipsisBtn = document.getElementById('ellipsisBtn');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        const refreshOption = document.getElementById('refreshOption');
 
-        // Audio element - SAME AS MAIN APP
-        const audio = new Audio();
-        let currentStation = null;
-        let currentStationIndex = -1;
-        let scrollTimeout;
+        // Placeholder URL for failed images
+        const PLACEHOLDER_URL = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='450' viewBox='0 0 300 450'%3E%3Crect width='300' height='450' fill='%231a1c28'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='18' fill='%2399CBFF'%3EMovie Poster%3C/text%3E%3C/svg%3E";
 
-        // Initialize the standalone radio panel
+        // Current filter state
+        let currentFilter = 'all';
+        let currentSearchTerm = '';
+        let isSearchActive = false;
+
+        // Initialize the page
         function init() {
-            renderRadioPanel();
-            setupRadioPanel();
+            renderMovies();
+            setupEventListeners();
             
-            // Auto-open the panel since this is standalone
-            radioPanel.classList.add('open');
-            overlay.classList.add('active');
+            // Prevent zooming with double-tap
+            document.addEventListener('touchstart', function(event) {
+                if (event.touches.length > 1) {
+                    event.preventDefault();
+                }
+            });
+
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
         }
 
-        // Render radio panel dynamically - SAME AS MAIN APP
-        function renderRadioPanel() {
-            radioList.innerHTML = '';
+        // Render movies based on current filter and search
+        function renderMovies() {
+            moviesGrid.innerHTML = '';
             
-            stations.forEach(station => {
-                const radioItem = document.createElement('div');
-                radioItem.className = 'radio-item';
-                radioItem.setAttribute('data-id', station.id);
+            let filteredMovies = movies;
+            
+            // Apply filter
+            if (currentFilter !== 'all') {
+                filteredMovies = filteredMovies.filter(movie => 
+                    movie.genres.some(genre => 
+                        genre.toLowerCase().includes(currentFilter.toLowerCase())
+                    )
+                );
+            }
+            
+            // Apply search
+            if (currentSearchTerm) {
+                filteredMovies = filteredMovies.filter(movie => 
+                    movie.title.toLowerCase().includes(currentSearchTerm.toLowerCase())
+                );
+                isSearchActive = true;
+            } else {
+                isSearchActive = false;
+            }
+            
+            if (filteredMovies.length === 0) {
+                moviesGrid.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <h3>No movies found</h3>
+                        <p>${isSearchActive ? 'Try a different search term' : 'Try a different filter'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredMovies.forEach(movie => {
+                const movieCard = document.createElement('div');
+                movieCard.className = 'movie-card';
+                movieCard.setAttribute('data-id', movie.id);
                 
-                radioItem.innerHTML = `
-                    <div class="radio-icon">
-                        <i class="${station.icon}"></i>
+                // Get the first two genres for display
+                const displayGenres = movie.genres.slice(0, 2).join(', ');
+                
+                movieCard.innerHTML = `
+                    <div class="movie-poster-container shimmer">
+                        <img class="movie-poster" data-src="${movie.poster}" alt="${movie.title}">
                     </div>
-                    <div class="radio-info">
-                        <div class="radio-name">${station.name}</div>
-                        <div class="radio-location">${station.location}</div>
+                    <div class="play-overlay">
+                        <button class="play-btn" data-movie-id="${movie.id}">
+                            <i class="fas fa-play"></i>
+                        </button>
                     </div>
-                    <button class="card-play-btn">
-                        <i class="fas fa-play"></i>
-                    </button>
+                    <div class="movie-info">
+                        <div class="movie-title">${movie.title}</div>
+                        <div class="movie-meta">
+                            <div class="movie-category">${displayGenres}</div>
+                            <div class="movie-year">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>${movie.year}</span>
+                            </div>
+                        </div>
+                    </div>
                 `;
                 
-                // Add event listeners - SAME AS MAIN APP
-                const playBtn = radioItem.querySelector('.card-play-btn');
-                playBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    toggleStationPlayback(station);
-                });
-                
-                radioItem.addEventListener('click', () => toggleStationPlayback(station));
-                
-                radioList.appendChild(radioItem);
+                moviesGrid.appendChild(movieCard);
             });
-        }
-
-        // Setup radio panel functionality - SAME AS MAIN APP
-        function setupRadioPanel() {
-            radioPanel.style.transition = 'bottom 0.3s ease';
-
-            // Radio back button functionality - Close the standalone page
-            radioBackButton.addEventListener('click', () => {
-                if (window.parent !== window) {
-                    // If embedded in iframe, send message to parent
-                    window.parent.postMessage({ action: 'closeRadio' }, '*');
-                } else {
-                    // If standalone, go back or close
-                    window.history.back();
-                }
-            });
-
-            overlay.addEventListener('click', function() {
-                if (window.parent !== window) {
-                    window.parent.postMessage({ action: 'closeRadio' }, '*');
-                } else {
-                    window.history.back();
-                }
-            });
-
-            radioPanel.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-
-            radioPanel.addEventListener('wheel', (e) => {
-                e.stopPropagation();
-            }, { passive: false });
-
-            radioPanel.addEventListener('touchmove', (e) => {
-                if (e.target.closest('.radio-content')) {
-                    return;
-                }
-                e.stopPropagation();
-            }, { passive: false });
-
-            // Now playing controls - SAME AS MAIN APP
-            nowPlayingPlayBtn.addEventListener('click', () => {
-                if (currentStation) {
-                    if (audio.paused) {
-                        playStation(currentStation);
-                    } else {
-                        pauseStation();
-                    }
-                }
-            });
-
-            nowPlayingStopBtn.addEventListener('click', () => {
-                stopPlayback();
-            });
-
-            nowPlayingPrevBtn.addEventListener('click', playPreviousStation);
-
-            nowPlayingNextBtn.addEventListener('click', playNextStation);
-
-            // Audio event listeners - SAME AS MAIN APP
-            audio.addEventListener('play', () => {
-                updatePlayButton(true);
-                updateCardStates();
-                updatePlaybackIndicator();
-                nowPlayingPanel.classList.add('visible');
-            });
-
-            audio.addEventListener('pause', () => {
-                updatePlayButton(false);
-                updateCardStates();
-                updatePlaybackIndicator();
-            });
-
-            document.addEventListener('keydown', (e) => {
-                if (e.code === 'Space' && currentStation) {
-                    e.preventDefault();
-                    if (audio.paused) {
-                        playStation(currentStation);
-                    } else {
-                        pauseStation();
-                    }
-                }
-            });
-
-            audio.volume = 1;
-
-            // Setup scrollbar visibility - SAME AS MAIN APP
-            setupRadioScrollbar();
-
-            // Floating playback indicator click handler
-            floatingPlaybackIndicator.addEventListener('click', () => {
-                if (currentStation) {
-                    radioPanel.classList.add('open');
-                    overlay.classList.add('active');
-                }
-            });
-        }
-
-        // Setup radio scrollbar visibility - SAME AS MAIN APP
-        function setupRadioScrollbar() {
-            const radioContent = document.querySelector('.radio-content');
             
-            radioContent.addEventListener('scroll', () => {
-                radioContent.classList.add('scrolling');
+            // Setup image loading for movie posters
+            setupMoviesImageLoading();
+        }
+
+        // Setup image loading for movies with error handling
+        function setupMoviesImageLoading() {
+            const movieImageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        const container = img.parentElement;
+                        
+                        // Use placeholder if image fails to load
+                        img.onerror = function() {
+                            this.src = PLACEHOLDER_URL;
+                            container.classList.add('fallback');
+                        };
+                        
+                        img.src = img.dataset.src;
+                        img.onload = () => {
+                            img.classList.add('loaded');
+                            container.classList.remove('shimmer');
+                        };
+                        
+                        movieImageObserver.unobserve(img);
+                    }
+                });
+            }, { 
+                rootMargin: '0px 0px 200px 0px',
+                threshold: 0.1
+            });
+            
+            document.querySelectorAll('.movie-poster').forEach(img => {
+                movieImageObserver.observe(img);
+            });
+        }
+
+        // Update cancel icon visibility
+        function updateCancelIcon() {
+            if (searchInput.value.length > 0) {
+                cancelIcon.classList.add('visible');
+            } else {
+                cancelIcon.classList.remove('visible');
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Back button functionality
+            moviesBackButton.addEventListener('click', () => {
+                window.location.reload();
+            });
+            
+            // Search icon functionality - show search header
+            searchIconBtn.addEventListener('click', () => {
+                moviesHeader.style.display = 'none';
+                searchHeader.style.display = 'flex';
+                searchInput.focus();
+                updateCancelIcon();
+            });
+            
+            // Search back button functionality
+            searchBackButton.addEventListener('click', () => {
+                searchHeader.style.display = 'none';
+                moviesHeader.style.display = 'flex';
+                currentSearchTerm = '';
+                searchInput.value = '';
+                updateCancelIcon();
+                renderMovies();
+            });
+            
+            // Search functionality - real-time search
+            searchInput.addEventListener('input', () => {
+                currentSearchTerm = searchInput.value.trim();
+                updateCancelIcon();
+                renderMovies();
+            });
+            
+            // Cancel icon functionality - delete one character at a time
+            cancelIcon.addEventListener('click', () => {
+                if (searchInput.value.length > 0) {
+                    searchInput.value = searchInput.value.slice(0, -1);
+                    currentSearchTerm = searchInput.value.trim();
+                    updateCancelIcon();
+                    renderMovies();
+                    searchInput.focus();
+                }
+            });
+            
+            // Enter key functionality for virtual keyboard
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    currentSearchTerm = searchInput.value.trim();
+                    renderMovies();
+                    searchInput.blur();
+                }
+            });
+            
+            // Filter functionality
+            moviesFilters.addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-btn')) {
+                    // Update active filter
+                    document.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    e.target.classList.add('active');
+                    
+                    // Apply filter
+                    currentFilter = e.target.dataset.filter;
+                    renderMovies();
+                }
+            });
+            
+            // Play button functionality
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.play-btn')) {
+                    const movieId = e.target.closest('.play-btn').getAttribute('data-movie-id');
+                    playMovie(movieId);
+                }
+            });
+            
+            // Ellipsis menu functionality
+            ellipsisBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('show');
+            });
+            
+            // Refresh option functionality
+            refreshOption.addEventListener('click', () => {
+                refreshMovies();
+                dropdownMenu.classList.remove('show');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', () => {
+                dropdownMenu.classList.remove('show');
+            });
+            
+            // Prevent dropdown from closing when clicking inside it
+            dropdownMenu.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+
+        // Play movie function
+        function playMovie(movieId) {
+            const movie = movies.find(m => m.id == movieId);
+            if (movie) {
+                alert(`Now playing: ${movie.title}`);
+            }
+        }
+
+        // Refresh movies function
+        function refreshMovies() {
+            // Show loading state
+            moviesGrid.innerHTML = '';
+            for (let i = 0; i < 8; i++) {
+                const placeholderCard = document.createElement('div');
+                placeholderCard.className = 'movie-card';
+                placeholderCard.innerHTML = `
+                    <div class="movie-poster-container shimmer"></div>
+                    <div class="movie-info">
+                        <div class="movie-title" style="color: transparent">Loading...</div>
+                        <div class="movie-meta">
+                            <div class="movie-category" style="color: transparent">Action, Drama</div>
+                            <div class="movie-year">
+                                <i class="fas fa-calendar-alt" style="color: transparent"></i>
+                                <span style="color: transparent">2023</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                moviesGrid.appendChild(placeholderCard);
+            }
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                // Reset search and filter
+                currentSearchTerm = '';
+                currentFilter = 'all';
+                searchInput.value = '';
+                updateCancelIcon();
                 
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(() => {
-                    radioContent.classList.remove('scrolling');
-                }, 1000);
-            });
+                // Update active filter button
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector('[data-filter="all"]').classList.add('active');
+                
+                // Re-render movies
+                renderMovies();
+            }, 1000);
         }
 
-        // Toggle station playback - SAME AS MAIN APP
-        function toggleStationPlayback(station) {
-            if (currentStation && currentStation.id === station.id) {
-                if (audio.paused) {
-                    playStation(station);
-                } else {
-                    pauseStation();
-                }
-            } else {
-                playStation(station);
-            }
-        }
-
-        // Play a radio station - SAME AS MAIN APP
-        function playStation(station) {
-            currentStation = station;
-            currentStationIndex = stations.findIndex(s => s.id === station.id);
-            audio.src = station.url;
-            audio.play().catch(err => console.error('Playback error:', err));
-            nowPlayingName.textContent = station.name;
-            nowPlayingLocation.textContent = station.location;
-            nowPlayingIcon.innerHTML = `<i class="${station.icon}"></i>`;
-            nowPlayingPanel.classList.add('visible');
-            updateCardStates();
-            updatePlaybackIndicator();
-        }
-
-        // Pause the current station - SAME AS MAIN APP
-        function pauseStation() {
-            audio.pause();
-            updatePlayButton(false);
-        }
-
-        // Stop playback - SAME AS MAIN APP
-        function stopPlayback() {
-            audio.pause();
-            audio.src = '';
-            currentStation = null;
-            currentStationIndex = -1;
-            nowPlayingPanel.classList.remove('visible');
-            updateCardStates();
-            updatePlaybackIndicator();
-        }
-
-        // Play previous station - SAME AS MAIN APP
-        function playPreviousStation() {
-            if (currentStationIndex > 0) {
-                currentStationIndex--;
-                playStation(stations[currentStationIndex]);
-            }
-        }
-
-        // Play next station - SAME AS MAIN APP
-        function playNextStation() {
-            if (currentStationIndex < stations.length - 1) {
-                currentStationIndex++;
-                playStation(stations[currentStationIndex]);
-            }
-        }
-
-        // Update play button state - SAME AS MAIN APP
-        function updatePlayButton(isPlaying) {
-            nowPlayingPlayBtn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
-        }
-
-        // Update card states - SAME AS MAIN APP
-        function updateCardStates() {
-            document.querySelectorAll('.radio-item').forEach(item => {
-                const stationId = parseInt(item.dataset.id);
-                const playBtn = item.querySelector('.card-play-btn');
-                if (currentStation && stationId === currentStation.id) {
-                    item.classList.add('active');
-                    playBtn.innerHTML = audio.paused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
-                } else {
-                    item.classList.remove('active');
-                    playBtn.innerHTML = '<i class="fas fa-play"></i>';
-                }
-            });
-        }
-
-        // Update floating playback indicator - SAME AS MAIN APP
-        function updatePlaybackIndicator() {
-            if (currentStation && !radioPanel.classList.contains('open')) {
-                floatingPlaybackIndicator.classList.add('visible');
-            } else {
-                floatingPlaybackIndicator.classList.remove('visible');
-            }
-        }
-
-        // Initialize when page loads
+        // Initialize the page when DOM is loaded
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
